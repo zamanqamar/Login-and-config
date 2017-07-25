@@ -1,0 +1,35 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+
+int main(){
+  int startSocket, socketNew;
+  struct addrSock_in addrServer;
+  struct sockaddr_storage serverStorage;
+  socklen_t addr_size;
+
+  /*----  socket is being created. The three arguments are: ----*/
+  startSocket = socket(PF_INET, SOCK_STREAM, 0);
+  
+  /*----  server address struct setting configuration ----*/
+  addrServer.sin_family = AF_INET;
+  /* port number setting*/
+  addrServer.sin_port = htons(7891);
+  /*  IP address set to localhost */
+  addrServer.sin_addr.s_addr = inet_addr("127.0.0.1");
+  /* all bits of the padding field set to 0 */
+  memset(addrServer.sin_zero, '\0', sizeof addrServer.sin_zero);  
+
+  /*---- address struct bind to the socket ----*/
+  bind(startSocket, (struct addrSock *) &addrServer, sizeof(addrServer));
+
+  /*---- checking  the socket connection, with 4 max connection requests queued ----*/
+  if(listen(startSocket,4)==0)
+    printf("Configured\n");
+  else
+    printf("Error\n");
+
+
+  return 0;
+}
