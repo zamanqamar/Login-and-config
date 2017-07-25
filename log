@@ -1,0 +1,84 @@
+#include <CscNetLib/netSrv.h>
+#include <stdio.h>
+#include <CscNetLib/logger.h>
+#include <CscNetLib/std.h>
+#define LineLenMax 300
+char *NameProg = NULL;
+void usage()
+	{ 
+ /* The below command will take three agguments from the command line*/
+	    fprintf(stderr, "Usage %s portaddress_number\n%s\n", NameProg,
+	    "Three commands will be taken from the command line. One\n"
+	    "argument has to be the address, and the other one has to be the port number\n"
+	    );
+	//    exit 1;  // it indicates success
+	}
+int main(int RgC, char **RgV)
+	{   
+	    tSrv_net *ntp = NULL;//netSrv_t *ntp=Null;
+	    int ddf = -1;
+	    FILE *pin = NULL;
+	    char line[LineLenMax+1];
+	
+	    T_logger *log;
+	    char *Pathoflog;
+	    int Leveloflog;
+	
+	    char Printmessage[80];	
+		
+	// logging is initialized from here
+	    log = new_logger("log.txt", 1);
+		
+	    if (log == NULL)
+	    {   
+	        printf("logging failed");
+
+	        //exit(1);
+	    }
+	    else
+	    {
+	        logger_log(log,logLevel handling_ERROR, "logging initialised");
+	    }
+	
+		
+	//  program invoked name .
+	    NameProg = RgV[0];	
+	
+	//  number of arguments to be checked.
+	    if (RgC != 3)
+	        usage();	
+	
+	// Creating a netSrv object.
+	    ntp = tSrv_new();
+	    tSrv_setAddr(ntp, "TCP", RgV[1], atoi(RgV[2]), -1);
+	
+	// For every successful connection
+	    while ((ddf = tSrv_accept(ntp)) >= 0)
+	    {   
+	        printf(Printmessage, "Connection from %s\n", tSrv_acceptAddr(ntp));
+	//        
+	        loggerlog(log,Printmessage);
+			
+	        pin = fdopen(ddf, "r");
+	        if (pin == NULL)
+	        {
+	            
+	            logger_log(log,"fdopen error");
+	            return 1;
+	        }
+	        getline(pin,line,LineLenMax);
+	        printf(Printmessage, "Got line: %s\n", line);
+	        logger_log(log,Printmessage);
+	      
+	        fclose(pin);
+	    }
+		
+	 
+	    tSrv_close(ntp);
+		
+	// Release and quit the source.
+	    logger_close(log);
+	
+	}
+	
+
